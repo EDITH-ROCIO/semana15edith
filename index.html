@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTest - Sistema de Matrícula con Pruebas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables y Reset */
+        :root {
+            --azul: #2563eb;
+            --azul-claro: #60a5fa;
+            --verde: #10b981;
+            --naranja: #f59e0b;
+            --rojo: #ef4444;
+            --morado: #8b5cf6;
+            --gris-oscuro: #1f2937;
+            --gris: #6b7280;
+            --gris-claro: #f3f4f6;
+            --blanco: #ffffff;
+            --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --sombra-fuerte: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --radio: 12px;
+            --transicion: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 100%);
+            color: var(--gris-oscuro);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .contenedor {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--blanco);
+            border-radius: var(--radio);
+            padding: 20px 30px;
+            box-shadow: var(--sombra);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icono {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--morado), var(--azul));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .logo-texto h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gris-oscuro);
+        }
+        
+        .logo-texto p {
+            font-size: 14px;
+            color: var(--gris);
+        }
+        
+        /* Navegación */
+        .navegacion {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 12px 20px;
+            background: var(--gris-claro);
+            border: none;
+            border-radius: 10px;
+            color: var(--gris-oscuro);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        
+        .nav-btn:hover {
+            background: var(--azul-claro);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: var(--morado);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* Contenido Principal */
+        .contenido {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        /* Panel Principal */
+        .panel-principal {
+            background: var(--blanco);
+            border-radius: var(--radio);
+            box-shadow: var(--sombra);
+            overflow: hidden;
+            min-height: 600px;
+        }
+        
+        /* Pantallas */
+        .pantalla {
+            display: none;
+            padding: 30px;
+            animation: aparecer 0.4s ease;
+        }
+        
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pantalla.activa {
+            display: block;
+        }
+        
+        .pantalla-titulo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--gris-oscuro);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Dashboard */
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .estadistica-card {
+            background: var(--gris-claro);
+            border-radius: var(--radio);
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: var(--transicion);
+            border: 2px solid transparent;
+        }
+        
+        .estadistica-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--morado);
+            box-shadow: var(--sombra-fuerte);
+        }
+        
+        .est-icono {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .est-pruebas { background: var(--morado); }
+        .est-exitosas { background: var(--verde); }
+        .est-fallidas { background: var(--rojo); }
+        .est-pendientes { background: var(--naranja); }
+        
+        .est-info h3 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .est-info p {
+            font-size: 15px;
+            color: var(--gris);
+        }
+        
+        /* Módulo de Pruebas */
+        .modulo-pruebas {
+            margin-top: 40px;
+        }
+        
+        .pruebas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .prueba-card {
+            background: var(--blanco);
+            border-radius: var(--radio);
+            padding: 25px;
+            box-shadow: var(--sombra);
+            border: 2px solid transparent;
+            transition: var(--transicion);
+        }
+        
+        .prueba-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-fuerte);
+        }
+        
+        .prueba-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .prueba-titulo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gris-oscuro);
+        }
+        
+        .prueba-estado {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .estado-exito {
+            background: #d1fae5;
+            color: var(--verde);
+        }
+        
+        .estado-fallo {
+            background: #fee2e2;
+            color: var(--rojo);
+        }
+        
+        .estado-pendiente {
+            background: #fef3c7;
+            color: var(--naranja);
+        }
+        
+        .prueba-descripcion {
+            color: var(--gris);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .prueba-acciones {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Evidencias */
+        .evidencias-container {
+            margin-top: 30px;
+            background: var(--gris-claro);
+            border-radius: var(--radio);
+            padding: 25px;
+        }
+        
+        .evidencia-item {
+            background: var(--blanco);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--morado);
+        }
+        
+        .evidencia-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .evidencia-titulo {
+            font-weight: 600;
+            color: var(--gris-oscuro);
+        }
+        
+        .evidencia-fecha {
+            font-size: 13px;
+            color: var(--gris);
+        }
+        
+        .evidencia-mensaje {
+            color: var(--gris);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Formularios de Prueba */
+        .formulario-prueba {
+            background: var(--gris-claro);
+            border-radius: var(--radio);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-grupo {
+            margin-bottom: 20px;
+        }
+        
+        .form-grupo label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gris-oscuro);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: var(--transicion);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--morado);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        .form-input.error {
+            border-color: var(--rojo);
+        }
+        
+        .mensaje-error {
+            color: var(--rojo);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .mensaje-error.mostrar {
+            display: block;
+        }
+        
+        /* Botones */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transicion);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primario {
+            background: var(--morado);
+            color: white;
+        }
+        
+        .btn-secundario {
+            background: var(--verde);
+            color: white;
+        }
+        
+        .btn-peligro {
+            background: var(--rojo);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--morado);
+            border: 2px solid var(--morado);
+        }
+        
+        .btn-pequeno {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        /* Alertas */
+        .alerta {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: aparecer 0.3s ease;
+        }
+        
+        .alerta-exito {
+            background: #d1fae5;
+            border-left: 4px solid var(--verde);
+            color: #065f46;
+        }
+        
+        .alerta-error {
+            background: #fee2e2;
+            border-left: 4px solid var(--rojo);
+            color: #991b1b;
+        }
+        
+        .alerta-advertencia {
+            background: #fef3c7;
+            border-left: 4px solid var(--naranja);
+            color: #92400e;
+        }
+        
+        .alerta-info {
+            background: #dbeafe;
+            border-left: 4px solid var(--azul);
+            color: #1e40af;
+        }
+        
+        /* Modal de Evidencia */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: aparecer 0.3s ease;
+        }
+        
+        .modal-overlay.activo {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--blanco);
+            border-radius: var(--radio);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--sombra-fuerte);
+            animation: deslizar 0.4s ease;
+        }
+        
+        @keyframes deslizar {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gris-oscuro);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cerrar-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gris);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cerrar-modal:hover {
+            background: #f3f4f6;
+            color: var(--rojo);
+        }
+        
+        /* Estado del sistema */
+        .estado-sistema {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 15px;
+            background: var(--gris-claro);
+            border-radius: 10px;
+        }
+        
+        .estado-indicador {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .estado-conectado {
+            background: var(--verde);
+            box-shadow: 0 0 10px var(--verde);
+            animation: latido 2s infinite;
+        }
+        
+        @keyframes latido {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .estado-desconectado {
+            background: var(--rojo);
+            box-shadow: 0 0 10px var(--rojo);
+        }
+        
+        /* Reportes de Pruebas */
+        .reporte-pruebas {
+            background: var(--gris-claro);
+            border-radius: var(--radio);
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .reporte-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .reporte-resumen {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .resumen-item {
+            background: var(--blanco);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .resumen-item h4 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .resumen-item p {
+            color: var(--gris);
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .pruebas-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .navegacion {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .pantalla {
+                padding: 20px;
+            }
+            
+            .pantalla-titulo {
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .estadistica-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal para Evidencia -->
+    <div class="modal-overlay" id="modalEvidencia">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-camera"></i> Captura de Evidencia</h3>
+                <button class="cerrar-modal" id="cerrarModalEvidencia">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="contenidoEvidencia">
+                    <!-- La evidencia se mostrará aquí -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="descargarEvidencia">
+                    <i class="fas fa-download"></i> Descargar Reporte
+                </button>
+                <button class="btn btn-primario" id="cerrarEvidencia">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenedor Principal -->
+    <div class="contenedor">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icono">
+                    <i class="fas fa-vial"></i>
+                </div>
+                <div class="logo-texto">
+                    <h1>EduTest Pro</h1>
+                    <p>Sistema de Matrícula con Módulo de Pruebas</p>
+                </div>
+            </div>
+            
+            <nav class="navegacion">
+                <button class="nav-btn active" data-pantalla="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-pantalla="pruebas-funcionales">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Pruebas Funcionales</span>
+                </button>
+                <button class="nav-btn" data-pantalla="validaciones">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Validaciones</span>
+                </button>
+                <button class="nav-btn" data-pantalla="casos-negativos">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Casos Negativos</span>
+                </button>
+                <button class="nav-btn" data-pantalla="evidencias">
+                    <i class="fas fa-camera"></i>
+                    <span>Evidencias</span>
+                </button>
+            </nav>
+        </header>
+        
+        <!-- Contenido Principal -->
+        <div class="contenido">
+            <!-- Panel Principal -->
+            <main class="panel-principal">
+                <!-- Pantalla: Dashboard -->
+                <div class="pantalla activa" id="dashboard">
+                    <h2 class="pantalla-titulo">
+                        <i class="fas fa-chart-line"></i>
+                        Dashboard de Pruebas
+                    </h2>
+                    
+                    <div class="resumen-grid">
+                        <div class="estadistica-card">
+                            <div class="est-icono est-pruebas">
+                                <i class="fas fa-vial"></i>
+                            </div>
+                            <div class="est-info">
+                                <h3 id="totalPruebas">15</h3>
+                                <p>Total de Pruebas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="estadistica-card">
+                            <div class="est-icono est-exitosas">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="est-info">
+                                <h3 id="pruebasExitosas">10</h3>
+                                <p>Pruebas Exitosas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="estadistica-card">
+                            <div class="est-icono est-fallidas">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="est-info">
+                                <h3 id="pruebasFallidas">3</h3>
+                                <p>Pruebas Fallidas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="estadistica-card">
+                            <div class="est-icono est-pendientes">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="est-info">
+                                <h3 id="pruebasPendientes">2</h3>
+                                <p>Pruebas Pendientes</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado del sistema -->
+                    <div class="estado-sistema">
+                        <div class="estado-indicador estado-conectado" id="indicadorEstado"></div>
+                        <span id="textoEstado">Sistema de pruebas activo</span>
+                    </div>
+                    
+                    <!-- Acciones rápidas -->
+                    <div style="margin-top: 30px;">
+                        <h3 class="pantalla-titulo" style="font-size: 20px; margin-bottom: 20px;">
+                            <i class="fas fa-bolt"></i> Acciones Rápidas
+                        </h3>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-primario" id="ejecutarTodasPruebas">
+                                <i class="fas fa-play"></i> Ejecutar Todas las Pruebas
+                            </button>
+                            <button class="btn btn-secundario" id="generarReporte">
+                                <i class="fas fa-file-pdf"></i> Generar Reporte
+                            </button>
+                            <button class="btn btn-peligro" id="simularErrores">
+                                <i class="fas fa-bug"></i> Simular Errores Masivos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Últimas evidencias -->
+                    <div class="evidencias-container" style="margin-top: 40px;">
+                        <h3 class="pantalla-titulo" style="font-size: 20px; margin-bottom: 20px;">
+                            <i class="fas fa-history"></i> Últimas Evidencias Capturadas
+                        </h3>
+                        <div id="listaEvidenciasRecientes">
+                            <!-- Las evidencias se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pantalla: Pruebas Funcionales -->
+                <div class="pantalla" id="pruebas-funcionales">
+                    <h2 class="pantalla-titulo">
+                        <i class="fas fa-check-circle"></i>
+                        Pruebas Funcionales del Sistema
+                    </h2>
+                    
+                    <div class="alerta alerta-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Pruebas Funcionales</strong>
+                            <p>Verifican que cada función del sistema opere correctamente según los requisitos especificados.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pruebas-grid">
+                        <!-- Prueba 1 -->
+                        <div class="prueba-card" data-prueba-id="1">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Registro de Usuario</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba1">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Verifica que un nuevo usuario pueda registrarse correctamente en el sistema con todos los campos requeridos.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="1">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="1">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Prueba 2 -->
+                        <div class="prueba-card" data-prueba-id="2">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Creación de Curso</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba2">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Valida que un administrador pueda crear un nuevo curso con todos los datos requeridos.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="2">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="2">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Prueba 3 -->
+                        <div class="prueba-card" data-prueba-id="3">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Matrícula en Curso</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba3">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Confirma que un estudiante pueda matricularse en un curso disponible.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="3">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="3">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Prueba 4 -->
+                        <div class="prueba-card" data-prueba-id="4">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Edición de Usuario</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba4">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Verifica que los datos de un usuario puedan ser actualizados correctamente.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="4">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="4">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulario para prueba manual -->
+                    <div class="formulario-prueba">
+                        <h3 class="pantalla-titulo" style="font-size: 20px; margin-bottom: 20px;">
+                            <i class="fas fa-user-edit"></i> Prueba Manual de Registro
+                        </h3>
+                        <form id="formularioPruebaRegistro">
+                            <div class="form-grid">
+                                <div class="form-grupo">
+                                    <label for="pruebaNombre">Nombre Completo *</label>
+                                    <input type="text" id="pruebaNombre" class="form-input" placeholder="Ej: Juan Pérez">
+                                    <div class="mensaje-error" id="errorNombre">El nombre es requerido y debe tener al menos 3 caracteres</div>
+                                </div>
+                                
+                                <div class="form-grupo">
+                                    <label for="pruebaEmail">Correo Electrónico *</label>
+                                    <input type="email" id="pruebaEmail" class="form-input" placeholder="ejemplo@universidad.edu">
+                                    <div class="mensaje-error" id="errorEmail">Debe ingresar un correo electrónico válido</div>
+                                </div>
+                                
+                                <div class="form-grupo">
+                                    <label for="pruebaTelefono">Teléfono *</label>
+                                    <input type="tel" id="pruebaTelefono" class="form-input" placeholder="+51 987 654 321">
+                                    <div class="mensaje-error" id="errorTelefono">El teléfono debe tener al menos 9 dígitos</div>
+                                </div>
+                                
+                                <div class="form-grupo">
+                                    <label for="pruebaRol">Rol *</label>
+                                    <select id="pruebaRol" class="form-input">
+                                        <option value="">Seleccionar rol</option>
+                                        <option value="estudiante">Estudiante</option>
+                                        <option value="profesor">Profesor</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                    <div class="mensaje-error" id="errorRol">Debe seleccionar un rol</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <button type="button" class="btn btn-primario" id="ejecutarPruebaManual">
+                                    <i class="fas fa-vial"></i> Ejecutar Prueba de Registro
+                                </button>
+                                <button type="button" class="btn btn-outline" id="limpiarFormularioPrueba">
+                                    <i class="fas fa-broom"></i> Limpiar Formulario
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Pantalla: Validaciones -->
+                <div class="pantalla" id="validaciones">
+                    <h2 class="pantalla-titulo">
+                        <i class="fas fa-shield-alt"></i>
+                        Pruebas de Validación
+                    </h2>
+                    
+                    <div class="alerta alerta-advertencia">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Validaciones del Sistema</strong>
+                            <p>Verifican que el sistema valide correctamente los datos de entrada y muestre mensajes de error apropiados.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pruebas-grid">
+                        <!-- Prueba de validación 1 -->
+                        <div class="prueba-card" data-prueba-id="5">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Email Inválido</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba5">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Verifica que el sistema rechace correos electrónicos con formato incorrecto.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="5">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="5">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Prueba de validación 2 -->
+                        <div class="prueba-card" data-prueba-id="6">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Campos Vacíos</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba6">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Valida que el sistema muestre errores cuando se envían formularios con campos requeridos vacíos.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="6">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="6">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Prueba de validación 3 -->
+                        <div class="prueba-card" data-prueba-id="7">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Límites de Caracteres</h3>
+                                <span class="prueba-estado estado-fallo" id="estadoPrueba7">Fallo</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Verifica que el sistema maneje correctamente campos con demasiados caracteres.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="7">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="7">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Prueba de validación 4 -->
+                        <div class="prueba-card" data-prueba-id="8">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Números Negativos</h3>
+                                <span class="prueba-estado estado-pendiente" id="estadoPrueba8">Pendiente</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Valida que el sistema rechace valores negativos en campos donde no son permitidos.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="8">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="8">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Prueba de validación manual -->
+                    <div class="formulario-prueba">
+                        <h3 class="pantalla-titulo" style="font-size: 20px; margin-bottom: 20px;">
+                            <i class="fas fa-vial-virus"></i> Prueba Manual de Validación
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                            <div>
+                                <h4 style="margin-bottom: 15px; color: var(--gris-oscuro);">Datos de Entrada</h4>
+                                <div class="form-grupo">
+                                    <label for="validacionDato">Dato a Validar</label>
+                                    <input type="text" id="validacionDato" class="form-input" placeholder="Ingrese dato para validar">
+                                </div>
+                                
+                                <div class="form-grupo">
+                                    <label for="tipoValidacion">Tipo de Validación</label>
+                                    <select id="tipoValidacion" class="form-input">
+                                        <option value="email">Correo Electrónico</option>
+                                        <option value="telefono">Teléfono</option>
+                                        <option value="numero">Número Positivo</option>
+                                        <option value="texto">Texto (3-50 chars)</option>
+                                        <option value="requerido">Campo Requerido</option>
+                                    </select>
+                                </div>
+                                
+                                <button class="btn btn-primario" id="ejecutarValidacion" style="margin-top: 20px;">
+                                    <i class="fas fa-check-circle"></i> Validar Dato
+                                </button>
+                            </div>
+                            
+                            <div>
+                                <h4 style="margin-bottom: 15px; color: var(--gris-oscuro);">Resultado de Validación</h4>
+                                <div id="resultadoValidacion" style="background: var(--gris-claro); padding: 20px; border-radius: 10px; min-height: 150px; display: flex; align-items: center; justify-content: center;">
+                                    <div style="text-align: center; color: var(--gris);">
+                                        <i class="fas fa-clipboard-check" style="font-size: 32px; margin-bottom: 10px;"></i>
+                                        <p>El resultado de la validación aparecerá aquí</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pantalla: Casos Negativos -->
+                <div class="pantalla" id="casos-negativos">
+                    <h2 class="pantalla-titulo">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Casos de Prueba Negativos
+                    </h2>
+                    
+                    <div class="alerta alerta-peligro">
+                        <i class="fas fa-radiation"></i>
+                        <div>
+                            <strong>Pruebas de Casos Negativos</strong>
+                            <p>Verifican cómo el sistema maneja situaciones anómalas, errores y entradas inválidas.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pruebas-grid">
+                        <!-- Caso negativo 1 -->
+                        <div class="prueba-card" data-prueba-id="9">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Servidor Offline</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba9">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Verifica que el sistema muestre mensajes apropiados cuando el servidor no está disponible.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="9">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="9">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Caso negativo 2 -->
+                        <div class="prueba-card" data-prueba-id="10">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Curso Lleno</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba10">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Valida que el sistema impida matrículas cuando un curso ha alcanzado su capacidad máxima.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="10">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="10">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Caso negativo 3 -->
+                        <div class="prueba-card" data-prueba-id="11">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Datos Corruptos</h3>
+                                <span class="prueba-estado estado-fallo" id="estadoPrueba11">Fallo</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Verifica que el sistema maneje correctamente datos corruptos o malformados.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="11">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="11">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Caso negativo 4 -->
+                        <div class="prueba-card" data-prueba-id="12">
+                            <div class="prueba-header">
+                                <h3 class="prueba-titulo">Ataque XSS</h3>
+                                <span class="prueba-estado estado-exito" id="estadoPrueba12">Éxito</span>
+                            </div>
+                            <p class="prueba-descripcion">
+                                Valida que el sistema sanitice entradas para prevenir ataques de inyección de scripts.
+                            </p>
+                            <div class="prueba-acciones">
+                                <button class="btn btn-pequeno btn-primario btn-ejecutar-prueba" data-prueba="12">
+                                    <i class="fas fa-play"></i> Ejecutar
+                                </button>
+                                <button class="btn btn-pequeno btn-outline btn-ver-evidencia" data-prueba="12">
+                                    <i class="fas fa-eye"></i> Ver Evidencia
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Simulación de casos negativos -->
+                    <div class="formulario-prueba">
+                        <h3 class="pantalla-titulo" style="font-size: 20px; margin-bottom: 20px;">
+                            <i class="fas fa-user-injured"></i> Simulador de Casos Negativos
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                            <div>
+                                <h4 style="margin-bottom: 15px; color: var(--gris-oscuro);">Seleccionar Escenario</h4>
+                                <div class="form-grupo">
+                                    <select id="escenarioNegativo" class="form-input">
+                                        <option value="servidor-offline">Servidor Offline</option>
+                                        <option value="curso-lleno">Curso Lleno</option>
+                                        <option value="timeout">Timeout de Conexión</option>
+                                        <option value="datos-invalidos">Datos Inválidos JSON</option>
+                                        <option value="permisos-insuficientes">Permisos Insuficientes</option>
+                                    </select>
+                                </div>
+                                
+                                <button class="btn btn-peligro" id="simularCasoNegativo" style="margin-top: 20px;">
+                                    <i class="fas fa-bug"></i> Simular Caso Negativo
+                                </button>
+                                
+                                <button class="btn btn-outline" id="reiniciarSistema" style="margin-top: 10px;">
+                                    <i class="fas fa-redo"></i> Reiniciar Sistema
+                                </button>
+                            </div>
+                            
+                            <div>
+                                <h4 style="margin-bottom: 15px; color: var(--gris-oscuro);">Respuesta del Sistema</h4>
+                                <div id="respuestaSistema" style="background: var(--gris-claro); padding: 20px; border-radius: 10px; min-height: 150px; display: flex; align-items: center; justify-content: center;">
+                                    <div style="text-align: center; color: var(--gris);">
+                                        <i class="fas fa-server" style="font-size: 32px; margin-bottom: 10px;"></i>
+                                        <p>La respuesta del sistema aparecerá aquí</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pantalla: Evidencias -->
+                <div class="pantalla" id="evidencias">
+                    <h2 class="pantalla-titulo">
+                        <i class="fas fa-camera"></i>
+                        Captura de Evidencias de Pruebas
+                    </h2>
+                    
+                    <div class="alerta alerta-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Sistema de Captura de Evidencias</strong>
+                            <p>Registro automático de resultados de pruebas con capturas de pantalla simuladas y reportes detallados.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Reporte de pruebas -->
+                    <div class="reporte-pruebas">
+                        <div class="reporte-header">
+                            <h3 style="font-size: 20px; color: var(--gris-oscuro);">
+                                <i class="fas fa-chart-pie"></i> Resumen de Pruebas
+                            </h3>
+                            <button class="btn btn-primario" id="capturarPantallaCompleta">
+                                <i class="fas fa-camera"></i> Capturar Pantalla Completa
+                            </button>
+                        </div>
+                        
+                        <div class="reporte-resumen">
+                            <div class="resumen-item">
+                                <h4 style="color: var(--morado);" id="totalEvidencias">8</h4>
+                                <p>Evidencias Capturadas</p>
+                            </div>
+                            <div class="resumen-item">
+                                <h4 style="color: var(--verde);" id="evidenciasExito">6</h4>
+                                <p>Evidencias de Éxito</p>
+                            </div>
+                            <div class="resumen-item">
+                                <h4 style="color: var(--rojo);" id="evidenciasFallo">2</h4>
+                                <p>Evidencias de Fallo</p>
+                            </div>
+                            <div class="resumen-item">
+                                <h4 style="color: var(--naranja);">85%</h4>
+                                <p>Tasa de Éxito</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Historial de evidencias -->
+                    <div class="evidencias-container">
+                        <h3 class="pantalla-titulo" style="font-size: 20px; margin-bottom: 20px;">
+                            <i class="fas fa-history"></i> Historial de Evidencias
+                        </h3>
+                        <div id="historialEvidencias">
+                            <!-- El historial se cargará aquí -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let historialEvidencias = [];
+        let resultadosPruebas = {};
+        let sistemaOperativo = true;
+        let contadorEvidencias = 0;
+        
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarSistema();
+            cargarDatosPruebas();
+            configurarEventos();
+            mostrarMensajeBienvenida();
+        });
+        
+        // Inicializar sistema
+        function inicializarSistema() {
+            // Inicializar resultados de pruebas
+            resultadosPruebas = {
+                1: { estado: "exito", mensaje: "Prueba de registro completada exitosamente" },
+                2: { estado: "exito", mensaje: "Curso creado correctamente" },
+                3: { estado: "exito", mensaje: "Matrícula realizada con éxito" },
+                4: { estado: "exito", mensaje: "Usuario editado correctamente" },
+                5: { estado: "exito", mensaje: "Email inválido detectado correctamente" },
+                6: { estado: "exito", mensaje: "Campos vacíos validados correctamente" },
+                7: { estado: "fallo", mensaje: "Error: límite de caracteres no validado" },
+                8: { estado: "pendiente", mensaje: "Prueba pendiente de ejecución" },
+                9: { estado: "exito", mensaje: "Servidor offline manejado correctamente" },
+                10: { estado: "exito", mensaje: "Curso lleno validado correctamente" },
+                11: { estado: "fallo", mensaje: "Error: datos corruptos no manejados adecuadamente" },
+                12: { estado: "exito", mensaje: "Ataque XSS prevenido correctamente" }
+            };
+            
+            // Inicializar historial de evidencias
+            historialEvidencias = [
+                {
+                    id: 1,
+                    fecha: new Date().toLocaleString(),
+                    tipo: "exito",
+                    titulo: "Registro de Usuario Exitoso",
+                    descripcion: "Usuario 'Juan Pérez' registrado correctamente en el sistema.",
+                    pruebaId: 1
+                },
+                {
+                    id: 2,
+                    fecha: new Date(Date.now() - 3600000).toLocaleString(),
+                    tipo: "exito",
+                    titulo: "Creación de Curso",
+                    descripcion: "Curso 'MAT101 - Matemáticas Básicas' creado exitosamente.",
+                    pruebaId: 2
+                },
+                {
+                    id: 3,
+                    fecha: new Date(Date.now() - 7200000).toLocaleString(),
+                    tipo: "exito",
+                    titulo: "Validación de Email",
+                    descripcion: "Email inválido 'usuario@' rechazado correctamente.",
+                    pruebaId: 5
+                },
+                {
+                    id: 4,
+                    fecha: new Date(Date.now() - 10800000).toLocaleString(),
+                    tipo: "fallo",
+                    titulo: "Error en Límite de Caracteres",
+                    descripcion: "Sistema no validó correctamente campo con 500 caracteres.",
+                    pruebaId: 7
+                }
+            ];
+            
+            contadorEvidencias = historialEvidencias.length;
+            
+            actualizarEstadisticas();
+            actualizarHistorialEvidencias();
+            actualizarEvidenciasRecientes();
+        }
+        
+        // Cargar datos de pruebas
+        function cargarDatosPruebas() {
+            // Actualizar estados de las pruebas en la interfaz
+            for (let i = 1; i <= 12; i++) {
+                const elemento = document.getElementById(`estadoPrueba${i}`);
+                if (elemento && resultadosPruebas[i]) {
+                    elemento.textContent = resultadosPruebas[i].estado === "exito" ? "Éxito" : 
+                                          resultadosPruebas[i].estado === "fallo" ? "Fallo" : "Pendiente";
+                    elemento.className = `prueba-estado estado-${resultadosPruebas[i].estado}`;
+                }
+            }
+        }
+        
+        // Actualizar estadísticas
+        function actualizarEstadisticas() {
+            const totalPruebas = 12;
+            const pruebasExitosas = Object.values(resultadosPruebas).filter(p => p.estado === "exito").length;
+            const pruebasFallidas = Object.values(resultadosPruebas).filter(p => p.estado === "fallo").length;
+            const pruebasPendientes = Object.values(resultadosPruebas).filter(p => p.estado === "pendiente").length;
+            
+            document.getElementById("totalPruebas").textContent = totalPruebas;
+            document.getElementById("pruebasExitosas").textContent = pruebasExitosas;
+            document.getElementById("pruebasFallidas").textContent = pruebasFallidas;
+            document.getElementById("pruebasPendientes").textContent = pruebasPendientes;
+            
+            // Actualizar estadísticas de evidencias
+            const evidenciasExito = historialEvidencias.filter(e => e.tipo === "exito").length;
+            const evidenciasFallo = historialEvidencias.filter(e => e.tipo === "fallo").length;
+            const tasaExito = totalPruebas > 0 ? Math.round((pruebasExitosas / totalPruebas) * 100) : 0;
+            
+            document.getElementById("totalEvidencias").textContent = historialEvidencias.length;
+            document.getElementById("evidenciasExito").textContent = evidenciasExito;
+            document.getElementById("evidenciasFallo").textContent = evidenciasFallo;
+        }
+        
+        // Actualizar historial de evidencias
+        function actualizarHistorialEvidencias() {
+            const contenedor = document.getElementById("historialEvidencias");
+            if (!contenedor) return;
+            
+            contenedor.innerHTML = historialEvidencias.map(evidencia => {
+                const icono = evidencia.tipo === "exito" ? "fa-check-circle" : 
+                             evidencia.tipo === "fallo" ? "fa-times-circle" : "fa-exclamation-circle";
+                const color = evidencia.tipo === "exito" ? "var(--verde)" : 
+                             evidencia.tipo === "fallo" ? "var(--rojo)" : "var(--naranja)";
+                
+                return `
+                    <div class="evidencia-item">
+                        <div class="evidencia-header">
+                            <div class="evidencia-titulo">
+                                <i class="fas ${icono}" style="color: ${color}; margin-right: 8px;"></i>
+                                ${evidencia.titulo}
+                            </div>
+                            <div class="evidencia-fecha">${evidencia.fecha}</div>
+                        </div>
+                        <div class="evidencia-mensaje">
+                            ${evidencia.descripcion}
+                        </div>
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="btn btn-pequeno btn-outline btn-ver-evidencia-detalle" data-evidencia-id="${evidencia.id}">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </button>
+                            <button class="btn btn-pequeno btn-outline btn-descargar-evidencia" data-evidencia-id="${evidencia.id}">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+            
+            // Agregar eventos a los botones
+            document.querySelectorAll(".btn-ver-evidencia-detalle").forEach(boton => {
+                boton.addEventListener("click", function() {
+                    const evidenciaId = parseInt(this.getAttribute("data-evidencia-id"));
+                    mostrarDetalleEvidencia(evidenciaId);
+                });
+            });
+        }
+        
+        // Actualizar evidencias recientes
+        function actualizarEvidenciasRecientes() {
+            const contenedor = document.getElementById("listaEvidenciasRecientes");
+            if (!contenedor) return;
+            
+            const evidenciasRecientes = [...historialEvidencias]
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                .slice(0, 3);
+            
+            contenedor.innerHTML = evidenciasRecientes.map(evidencia => {
+                const icono = evidencia.tipo === "exito" ? "fa-check-circle text-green-500" : 
+                             evidencia.tipo === "fallo" ? "fa-times-circle text-red-500" : "fa-exclamation-circle text-yellow-500";
+                
+                return `
+                    <div class="evidencia-item">
+                        <div class="evidencia-header">
+                            <div class="evidencia-titulo">${evidencia.titulo}</div>
+                            <div class="evidencia-fecha">${evidencia.fecha}</div>
+                        </div>
+                        <div class="evidencia-mensaje">
+                            ${evidencia.descripcion}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+        
+        // Ejecutar prueba individual
+        function ejecutarPrueba(pruebaId) {
+            if (!sistemaOperativo) {
+                mostrarAlerta("El sistema no está operativo. No se pueden ejecutar pruebas.", "error");
+                return;
+            }
+            
+            // Simular ejecución de prueba
+            mostrarAlerta(`Ejecutando prueba ${pruebaId}...`, "info");
+            
+            setTimeout(() => {
+                // Determinar resultado aleatorio (80% éxito, 15% fallo, 5% error)
+                const random = Math.random();
+                let resultado;
+                
+                if (random < 0.8) {
+                    resultado = { estado: "exito", mensaje: `Prueba ${pruebaId} completada exitosamente` };
+                } else if (random < 0.95) {
+                    resultado = { estado: "fallo", mensaje: `Prueba ${pruebaId} falló - Error en validación` };
+                } else {
+                    resultado = { estado: "error", mensaje: `Prueba ${pruebaId} - Error crítico del sistema` };
+                    sistemaOperativo = false;
+                    actualizarEstadoSistema();
+                }
+                
+                // Actualizar resultado
+                resultadosPruebas[pruebaId] = resultado;
+                
+                // Crear evidencia
+                const nuevaEvidencia = {
+                    id: ++contadorEvidencias,
+                    fecha: new Date().toLocaleString(),
+                    tipo: resultado.estado,
+                    titulo: `Prueba ${pruebaId} - ${resultado.estado === "exito" ? "Éxito" : resultado.estado === "fallo" ? "Fallo" : "Error"}`,
+                    descripcion: resultado.mensaje,
+                    pruebaId: pruebaId
+                };
+                
+                historialEvidencias.unshift(nuevaEvidencia);
+                
+                // Actualizar interfaz
+                cargarDatosPruebas();
+                actualizarEstadisticas();
+                actualizarHistorialEvidencias();
+                actualizarEvidenciasRecientes();
+                
+                mostrarAlerta(`Prueba ${pruebaId} completada: ${resultado.mensaje}`, 
+                             resultado.estado === "exito" ? "exito" : "error");
+                
+                // Capturar evidencia automáticamente
+                capturarEvidenciaAutomatica(pruebaId, resultado);
+            }, 1500);
+        }
+        
+        // Capturar evidencia automática
+        function capturarEvidenciaAutomatica(pruebaId, resultado) {
+            const modal = document.getElementById("modalEvidencia");
+            const contenido = document.getElementById("contenidoEvidencia");
+            
+            contenido.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 48px; color: ${resultado.estado === 'exito' ? 'var(--verde)' : 'var(--rojo)'}; margin-bottom: 20px;">
+                        <i class="fas ${resultado.estado === 'exito' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                    </div>
+                    <h3 style="margin-bottom: 15px; color: var(--gris-oscuro);">Prueba #${pruebaId}</h3>
+                    <p style="color: var(--gris); margin-bottom: 20px;">${resultado.mensaje}</p>
+                    
+                    <div style="background: var(--gris-claro); padding: 20px; border-radius: 10px; text-align: left; margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px; color: var(--gris-oscuro);">Detalles de la Prueba:</h4>
+                        <ul style="color: var(--gris); padding-left: 20px;">
+                            <li>Fecha: ${new Date().toLocaleString()}</li>
+                            <li>Estado: ${resultado.estado === 'exito' ? 'Éxito' : 'Fallo'}</li>
+                            <li>ID de Prueba: ${pruebaId}</li>
+                            <li>Tiempo de ejecución: ${(Math.random() * 2 + 1).toFixed(2)} segundos</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 10px; border: 2px dashed #e2e8f0;">
+                        <h4 style="margin-bottom: 10px; color: var(--gris-oscuro);">Captura de Pantalla Simulada:</h4>
+                        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center;">
+                                <i class="fas fa-desktop" style="font-size: 48px; color: #cbd5e1; margin-bottom: 10px;"></i>
+                                <p style="color: #64748b;">Captura de pantalla generada automáticamente</p>
+                                <small style="color: #94a3b8;">${resultado.estado === 'exito' ? 'Estado: VERDE - Prueba exitosa' : 'Estado: ROJO - Prueba fallida'}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add("activo");
+        }
+        
+        // Mostrar detalle de evidencia
+        function mostrarDetalleEvidencia(evidenciaId) {
+            const evidencia = historialEvidencias.find(e => e.id === evidenciaId);
+            if (!evidencia) return;
+            
+            const modal = document.getElementById("modalEvidencia");
+            const contenido = document.getElementById("contenidoEvidencia");
+            
+            contenido.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 48px; color: ${evidencia.tipo === 'exito' ? 'var(--verde)' : 'var(--rojo)'}; margin-bottom: 20px;">
+                        <i class="fas ${evidencia.tipo === 'exito' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                    </div>
+                    <h3 style="margin-bottom: 15px; color: var(--gris-oscuro);">${evidencia.titulo}</h3>
+                    <p style="color: var(--gris); margin-bottom: 20px;">${evidencia.descripcion}</p>
+                    
+                    <div style="background: var(--gris-claro); padding: 20px; border-radius: 10px; text-align: left; margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px; color: var(--gris-oscuro);">Información de la Evidencia:</h4>
+                        <ul style="color: var(--gris); padding-left: 20px;">
+                            <li>ID de Evidencia: ${evidencia.id}</li>
+                            <li>Fecha y Hora: ${evidencia.fecha}</li>
+                            <li>Tipo: ${evidencia.tipo === 'exito' ? 'Éxito' : 'Fallo'}</li>
+                            <li>Prueba Asociada: #${evidencia.pruebaId || 'N/A'}</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4 style="margin-bottom: 10px; color: var(--gris-oscuro);">Análisis de Resultados:</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                <div style="font-size: 12px; color: var(--gris); margin-bottom: 5px;">Impacto</div>
+                                <div style="font-weight: 600; color: var(--gris-oscuro);">${evidencia.tipo === 'exito' ? 'Bajo' : 'Alto'}</div>
+                            </div>
+                            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                <div style="font-size: 12px; color: var(--gris); margin-bottom: 5px;">Prioridad</div>
+                                <div style="font-weight: 600; color: var(--gris-oscuro);">${evidencia.tipo === 'exito' ? 'Normal' : 'Crítica'}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add("activo");
+        }
+        
+        // Validar dato
+        function validarDato(dato, tipo) {
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const regexTelefono = /^[\+]?[0-9\s\-\(\)]{9,}$/;
+            
+            switch(tipo) {
+                case "email":
+                    return regexEmail.test(dato) ? 
+                        { valido: true, mensaje: "✓ Email válido" } : 
+                        { valido: false, mensaje: "✗ Email inválido. Debe tener formato usuario@dominio.com" };
+                        
+                case "telefono":
+                    return regexTelefono.test(dato) ?
+                        { valido: true, mensaje: "✓ Teléfono válido" } :
+                        { valido: false, mensaje: "✗ Teléfono inválido. Debe tener al menos 9 dígitos" };
+                        
+                case "numero":
+                    const num = parseInt(dato);
+                    return !isNaN(num) && num > 0 ?
+                        { valido: true, mensaje: "✓ Número positivo válido" } :
+                        { valido: false, mensaje: "✗ Debe ser un número positivo mayor a 0" };
+                        
+                case "texto":
+                    return dato.length >= 3 && dato.length <= 50 ?
+                        { valido: true, mensaje: "✓ Texto válido (3-50 caracteres)" } :
+                        { valido: false, mensaje: "✗ El texto debe tener entre 3 y 50 caracteres" };
+                        
+                case "requerido":
+                    return dato.trim() !== "" ?
+                        { valido: true, mensaje: "✓ Campo completado" } :
+                        { valido: false, mensaje: "✗ Este campo es requerido" };
+                        
+                default:
+                    return { valido: false, mensaje: "Tipo de validación no reconocido" };
+            }
+        }
+        
+        // Mostrar alerta
+        function mostrarAlerta(mensaje, tipo = "info") {
+            // Crear elemento de alerta
+            const alerta = document.createElement("div");
+            alerta.className = `alerta alerta-${tipo}`;
+            alerta.innerHTML = `
+                <i class="fas ${tipo === 'exito' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                <div>${mensaje}</div>
+            `;
+            
+            // Agregar al inicio del panel principal
+            const panelPrincipal = document.querySelector(".panel-principal");
+            if (panelPrincipal) {
+                panelPrincipal.insertBefore(alerta, panelPrincipal.firstChild);
+                
+                // Eliminar después de 5 segundos
+                setTimeout(() => {
+                    if (alerta.parentNode) {
+                        alerta.style.opacity = "0";
+                        alerta.style.transform = "translateY(-10px)";
+                        setTimeout(() => alerta.remove(), 300);
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Mostrar mensaje de bienvenida
+        function mostrarMensajeBienvenida() {
+            setTimeout(() => {
+                mostrarAlerta("¡Bienvenido a EduTest Pro! Sistema de pruebas de matrícula cargado correctamente.", "exito");
+            }, 1000);
+        }
+        
+        // Actualizar estado del sistema
+        function actualizarEstadoSistema() {
+            const indicador = document.getElementById("indicadorEstado");
+            const texto = document.getElementById("textoEstado");
+            
+            if (sistemaOperativo) {
+                indicador.className = "estado-indicador estado-conectado";
+                texto.textContent = "Sistema de pruebas activo";
+            } else {
+                indicador.className = "estado-indicador estado-desconectado";
+                texto.textContent = "Sistema offline - Modo de recuperación";
+            }
+        }
+        
+        // Configurar eventos
+        function configurarEventos() {
+            // Navegación
+            document.querySelectorAll(".nav-btn").forEach(boton => {
+                boton.addEventListener("click", function() {
+                    const pantallaId = this.getAttribute("data-pantalla");
+                    
+                    // Actualizar botón activo
+                    document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+                    this.classList.add("active");
+                    
+                    // Mostrar pantalla seleccionada
+                    document.querySelectorAll(".pantalla").forEach(pantalla => {
+                        pantalla.classList.remove("activa");
+                    });
+                    document.getElementById(pantallaId).classList.add("activa");
+                });
+            });
+            
+            // Ejecutar pruebas individuales
+            document.querySelectorAll(".btn-ejecutar-prueba").forEach(boton => {
+                boton.addEventListener("click", function() {
+                    const pruebaId = parseInt(this.getAttribute("data-prueba"));
+                    ejecutarPrueba(pruebaId);
+                });
+            });
+            
+            // Ver evidencias de pruebas
+            document.querySelectorAll(".btn-ver-evidencia").forEach(boton => {
+                boton.addEventListener("click", function() {
+                    const pruebaId = parseInt(this.getAttribute("data-prueba"));
+                    const prueba = resultadosPruebas[pruebaId];
+                    
+                    if (prueba) {
+                        capturarEvidenciaAutomatica(pruebaId, prueba);
+                    }
+                });
+            });
+            
+            // Ejecutar prueba manual de registro
+            document.getElementById("ejecutarPruebaManual").addEventListener("click", function() {
+                const nombre = document.getElementById("pruebaNombre").value;
+                const email = document.getElementById("pruebaEmail").value;
+                const telefono = document.getElementById("pruebaTelefono").value;
+                const rol = document.getElementById("pruebaRol").value;
+                
+                let valido = true;
+                
+                // Validar nombre
+                if (!nombre || nombre.length < 3) {
+                    document.getElementById("errorNombre").classList.add("mostrar");
+                    document.getElementById("pruebaNombre").classList.add("error");
+                    valido = false;
+                } else {
+                    document.getElementById("errorNombre").classList.remove("mostrar");
+                    document.getElementById("pruebaNombre").classList.remove("error");
+                }
+                
+                // Validar email
+                const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regexEmail.test(email)) {
+                    document.getElementById("errorEmail").classList.add("mostrar");
+                    document.getElementById("pruebaEmail").classList.add("error");
+                    valido = false;
+                } else {
+                    document.getElementById("errorEmail").classList.remove("mostrar");
+                    document.getElementById("pruebaEmail").classList.remove("error");
+                }
+                
+                // Validar teléfono
+                if (!telefono || telefono.replace(/\D/g, '').length < 9) {
+                    document.getElementById("errorTelefono").classList.add("mostrar");
+                    document.getElementById("pruebaTelefono").classList.add("error");
+                    valido = false;
+                } else {
+                    document.getElementById("errorTelefono").classList.remove("mostrar");
+                    document.getElementById("pruebaTelefono").classList.remove("error");
+                }
+                
+                // Validar rol
+                if (!rol) {
+                    document.getElementById("errorRol").classList.add("mostrar");
+                    document.getElementById("pruebaRol").classList.add("error");
+                    valido = false;
+                } else {
+                    document.getElementById("errorRol").classList.remove("mostrar");
+                    document.getElementById("pruebaRol").classList.remove("error");
+                }
+                
+                if (valido) {
+                    mostrarAlerta(`✓ Prueba de registro exitosa: ${nombre} registrado como ${rol}`, "exito");
+                    
+                    // Crear evidencia
+                    const nuevaEvidencia = {
+                        id: ++contadorEvidencias,
+                        fecha: new Date().toLocaleString(),
+                        tipo: "exito",
+                        titulo: "Prueba Manual de Registro",
+                        descripcion: `Usuario ${nombre} (${email}) registrado exitosamente como ${rol}`,
+                        pruebaId: 99
+                    };
+                    
+                    historialEvidencias.unshift(nuevaEvidencia);
+                    actualizarEstadisticas();
+                    actualizarHistorialEvidencias();
+                    actualizarEvidenciasRecientes();
+                } else {
+                    mostrarAlerta("✗ Error: Complete todos los campos correctamente", "error");
+                }
+            });
+            
+            // Limpiar formulario de prueba
+            document.getElementById("limpiarFormularioPrueba").addEventListener("click", function() {
+                document.getElementById("formularioPruebaRegistro").reset();
+                
+                // Limpiar errores
+                document.querySelectorAll(".mensaje-error").forEach(error => {
+                    error.classList.remove("mostrar");
+                });
+                
+                document.querySelectorAll(".form-input").forEach(input => {
+                    input.classList.remove("error");
+                });
+                
+                mostrarAlerta("Formulario limpiado correctamente", "info");
+            });
+            
+            // Ejecutar validación manual
+            document.getElementById("ejecutarValidacion").addEventListener("click", function() {
+                const dato = document.getElementById("validacionDato").value;
+                const tipo = document.getElementById("tipoValidacion").value;
+                
+                if (!dato.trim()) {
+                    mostrarAlerta("Ingrese un dato para validar", "error");
+                    return;
+                }
+                
+                const resultado = validarDato(dato, tipo);
+                const contenedor = document.getElementById("resultadoValidacion");
+                
+                if (resultado.valido) {
+                    contenedor.innerHTML = `
+                        <div style="text-align: center; color: var(--verde);">
+                            <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <h4 style="margin-bottom: 10px; font-weight: 600;">Validación Exitosa</h4>
+                            <p>${resultado.mensaje}</p>
+                        </div>
+                    `;
+                    
+                    mostrarAlerta("✓ Validación exitosa", "exito");
+                } else {
+                    contenedor.innerHTML = `
+                        <div style="text-align: center; color: var(--rojo);">
+                            <i class="fas fa-times-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <h4 style="margin-bottom: 10px; font-weight: 600;">Validación Fallida</h4>
+                            <p>${resultado.mensaje}</p>
+                        </div>
+                    `;
+                    
+                    mostrarAlerta("✗ Validación fallida", "error");
+                }
+            });
+            
+            // Simular caso negativo
+            document.getElementById("simularCasoNegativo").addEventListener("click", function() {
+                const escenario = document.getElementById("escenarioNegativo").value;
+                const contenedor = document.getElementById("respuestaSistema");
+                
+                let respuesta;
+                
+                switch(escenario) {
+                    case "servidor-offline":
+                        respuesta = {
+                            titulo: "Error de Conexión",
+                            mensaje: "No se pudo establecer conexión con el servidor. Verifique su conexión a internet e intente nuevamente.",
+                            tipo: "error"
+                        };
+                        sistemaOperativo = false;
+                        break;
+                        
+                    case "curso-lleno":
+                        respuesta = {
+                            titulo: "Curso Lleno",
+                            mensaje: "El curso ha alcanzado su capacidad máxima. No se pueden aceptar más matrículas.",
+                            tipo: "error"
+                        };
+                        break;
+                        
+                    case "timeout":
+                        respuesta = {
+                            titulo: "Timeout de Conexión",
+                            mensaje: "La solicitud ha excedido el tiempo de espera. Por favor, intente nuevamente.",
+                            tipo: "error"
+                        };
+                        break;
+                        
+                    case "datos-invalidos":
+                        respuesta = {
+                            titulo: "Datos Inválidos",
+                            mensaje: "Los datos proporcionados no tienen el formato correcto. Verifique la información e intente nuevamente.",
+                            tipo: "error"
+                        };
+                        break;
+                        
+                    case "permisos-insuficientes":
+                        respuesta = {
+                            titulo: "Permisos Insuficientes",
+                            mensaje: "No tiene los permisos necesarios para realizar esta acción. Contacte al administrador.",
+                            tipo: "error"
+                        };
+                        break;
+                        
+                    default:
+                        respuesta = {
+                            titulo: "Error Desconocido",
+                            mensaje: "Ha ocurrido un error inesperado en el sistema.",
+                            tipo: "error"
+                        };
+                }
+                
+                contenedor.innerHTML = `
+                    <div style="text-align: center; color: ${respuesta.tipo === 'error' ? 'var(--rojo)' : 'var(--verde)'};">
+                        <i class="fas ${respuesta.tipo === 'error' ? 'fa-exclamation-triangle' : 'fa-check-circle'}" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <h4 style="margin-bottom: 10px; font-weight: 600;">${respuesta.titulo}</h4>
+                        <p>${respuesta.mensaje}</p>
+                    </div>
+                `;
+                
+                // Actualizar estado del sistema si es necesario
+                if (escenario === "servidor-offline") {
+                    actualizarEstadoSistema();
+                }
+                
+                mostrarAlerta(`Caso negativo simulado: ${respuesta.titulo}`, respuesta.tipo);
+            });
+            
+            // Reiniciar sistema
+            document.getElementById("reiniciarSistema").addEventListener("click", function() {
+                sistemaOperativo = true;
+                actualizarEstadoSistema();
+                
+                document.getElementById("respuestaSistema").innerHTML = `
+                    <div style="text-align: center; color: var(--verde);">
+                        <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <h4 style="margin-bottom: 10px; font-weight: 600;">Sistema Reiniciado</h4>
+                        <p>El sistema ha sido reiniciado exitosamente. Todas las funciones están disponibles.</p>
+                    </div>
+                `;
+                
+                mostrarAlerta("✓ Sistema reiniciado correctamente", "exito");
+            });
+            
+            // Ejecutar todas las pruebas
+            document.getElementById("ejecutarTodasPruebas").addEventListener("click", function() {
+                if (!sistemaOperativo) {
+                    mostrarAlerta("El sistema no está operativo. No se pueden ejecutar pruebas.", "error");
+                    return;
+                }
+                
+                mostrarAlerta("Ejecutando todas las pruebas... Esto puede tomar unos momentos.", "info");
+                
+                let completadas = 0;
+                const totalPruebas = 12;
+                
+                // Ejecutar pruebas secuencialmente
+                for (let i = 1; i <= totalPruebas; i++) {
+                    setTimeout(() => {
+                        if (sistemaOperativo) {
+                            ejecutarPrueba(i);
+                            completadas++;
+                            
+                            if (completadas === totalPruebas) {
+                                setTimeout(() => {
+                                    mostrarAlerta("✓ Todas las pruebas han sido ejecutadas", "exito");
+                                }, 500);
+                            }
+                        }
+                    }, i * 1000);
+                }
+            });
+            
+            // Generar reporte
+            document.getElementById("generarReporte").addEventListener("click", function() {
+                const exito = Math.random() > 0.1; // 90% de éxito
+                
+                if (exito) {
+                    mostrarAlerta("✓ Reporte generado exitosamente. Descargando...", "exito");
+                    
+                    // Simular descarga
+                    setTimeout(() => {
+                        const nuevaEvidencia = {
+                            id: ++contadorEvidencias,
+                            fecha: new Date().toLocaleString(),
+                            tipo: "exito",
+                            titulo: "Reporte de Pruebas Generado",
+                            descripcion: "Reporte completo del sistema de pruebas generado y descargado exitosamente.",
+                            pruebaId: 100
+                        };
+                        
+                        historialEvidencias.unshift(nuevaEvidencia);
+                        actualizarEstadisticas();
+                        actualizarHistorialEvidencias();
+                        actualizarEvidenciasRecientes();
+                        
+                        mostrarAlerta("✓ Reporte descargado correctamente", "exito");
+                    }, 1500);
+                } else {
+                    mostrarAlerta("✗ Error al generar el reporte. Intente nuevamente.", "error");
+                }
+            });
+            
+            // Simular errores masivos
+            document.getElementById("simularErrores").addEventListener("click", function() {
+                mostrarAlerta("⚠ Simulando errores masivos en el sistema...", "advertencia");
+                
+                // Cambiar estado de varias pruebas a fallo
+                for (let i = 1; i <= 5; i++) {
+                    const pruebaAleatoria = Math.floor(Math.random() * 12) + 1;
+                    resultadosPruebas[pruebaAleatoria] = { 
+                        estado: "fallo", 
+                        mensaje: `Error simulado en prueba ${pruebaAleatoria}` 
+                    };
+                }
+                
+                // Crear evidencias de error
+                for (let i = 0; i < 3; i++) {
+                    const nuevaEvidencia = {
+                        id: ++contadorEvidencias,
+                        fecha: new Date().toLocaleString(),
+                        tipo: "fallo",
+                        titulo: `Error Masivo Simulado ${i + 1}`,
+                        descripcion: "Error de sistema simulado para pruebas de recuperación.",
+                        pruebaId: 101 + i
+                    };
+                    
+                    historialEvidencias.unshift(nuevaEvidencia);
+                }
+                
+                // Actualizar interfaz
+                cargarDatosPruebas();
+                actualizarEstadisticas();
+                actualizarHistorialEvidencias();
+                actualizarEvidenciasRecientes();
+                
+                mostrarAlerta("✓ Errores masivos simulados correctamente. Verifique el estado del sistema.", "exito");
+            });
+            
+            // Capturar pantalla completa
+            document.getElementById("capturarPantallaCompleta").addEventListener("click", function() {
+                mostrarAlerta("Capturando pantalla completa...", "info");
+                
+                setTimeout(() => {
+                    const nuevaEvidencia = {
+                        id: ++contadorEvidencias,
+                        fecha: new Date().toLocaleString(),
+                        tipo: "exito",
+                        titulo: "Captura de Pantalla Completa",
+                        descripcion: "Captura de pantalla del sistema de pruebas realizada exitosamente.",
+                        pruebaId: 200
+                    };
+                    
+                    historialEvidencias.unshift(nuevaEvidencia);
+                    actualizarEstadisticas();
+                    actualizarHistorialEvidencias();
+                    actualizarEvidenciasRecientes();
+                    
+                    mostrarAlerta("✓ Captura de pantalla completada y guardada en evidencias", "exito");
+                }, 1000);
+            });
+            
+            // Cerrar modal de evidencia
+            document.getElementById("cerrarModalEvidencia").addEventListener("click", function() {
+                document.getElementById("modalEvidencia").classList.remove("activo");
+            });
+            
+            document.getElementById("cerrarEvidencia").addEventListener("click", function() {
+                document.getElementById("modalEvidencia").classList.remove("activo");
+            });
+            
+            // Descargar evidencia
+            document.getElementById("descargarEvidencia").addEventListener("click", function() {
+                mostrarAlerta("✓ Evidencia descargada correctamente", "exito");
+                
+                setTimeout(() => {
+                    document.getElementById("modalEvidencia").classList.remove("activo");
+                }, 1000);
+            });
+            
+            // Cerrar modal al hacer clic fuera
+            document.getElementById("modalEvidencia").addEventListener("click", function(e) {
+                if (e.target === this) {
+                    this.classList.remove("activo");
+                }
+            });
+            
+            // Cerrar modal con Escape
+            document.addEventListener("keydown", function(e) {
+                if (e.key === "Escape") {
+                    document.getElementById("modalEvidencia").classList.remove("activo");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
